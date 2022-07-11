@@ -1,18 +1,18 @@
 const Header = (props) => <h1>{props.course}</h1>;
+
+const Part = (props) => (
+	<p>
+		{props.partName} {props.partExercises}
+	</p>
+);
 const Content = (props) => {
 	const data = props.data;
 	return (
-		<>
-			<p>
-				{data.part1} {data.exercises1}
-			</p>
-			<p>
-				{data.part2} {data.exercises2}
-			</p>
-			<p>
-				{data.part3} {data.exercises3}
-			</p>
-		</>
+		<div>
+			<Part partName={data.part1} partExercises={data.exercises1} />
+			<Part partName={data.part2} partExercises={data.exercises2} />
+			<Part partName={data.part3} partExercises={data.exercises3} />
+		</div>
 	);
 };
 const Total = (props) => <p>Number of exercises {props.total}</p>;
