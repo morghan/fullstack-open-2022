@@ -15,39 +15,42 @@ const Feedback = ({
 const Statistics = ({
 	data: { good: dataGood, neutral: dataNeutral, bad: dataBad },
 }) => {
-	const sumData = () => {
+	const addData = () => {
 		return dataGood + dataNeutral + dataBad;
 	};
 
+	// No validation required for totals due to conditional rendering
 	const average = () => {
-		const total = sumData();
-		const average = total ? ((dataGood - dataBad) / total).toFixed(2) : 0;
-		return average;
+		const total = addData();
+		return ((dataGood - dataBad) / total).toFixed(2);
 	};
 
 	const positivePercentage = () => {
-		const total = sumData();
-		const positivePercentage = total
-			? `${((dataGood / total) * 100).toFixed(2)}%`
-			: 0;
-		return positivePercentage;
+		const total = addData();
+		return `${((dataGood / total) * 100).toFixed(2)}%`;
 	};
 
 	return (
 		<div>
 			<h2>Statistics</h2>
-			<p>Good {dataGood}</p>
-			<p>Neutral {dataNeutral}</p>
-			<p>Bad {dataBad}</p>
-			<p>
-				<b>All : {sumData()}</b>
-			</p>
-			<p>
-				<b>Average : {average()}</b>
-			</p>
-			<p>
-				<b>Positive : {positivePercentage()}</b>
-			</p>
+			{dataGood || dataNeutral || dataBad ? (
+				<>
+					<p>Good {dataGood}</p>
+					<p>Neutral {dataNeutral}</p>
+					<p>Bad {dataBad}</p>
+					<p>
+						<b>All : {addData()}</b>
+					</p>
+					<p>
+						<b>Average : {average()}</b>
+					</p>
+					<p>
+						<b>Positive : {positivePercentage()}</b>
+					</p>
+				</>
+			) : (
+				<p>No feedback given</p>
+			)}
 		</div>
 	);
 };
