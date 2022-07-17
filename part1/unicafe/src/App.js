@@ -14,14 +14,43 @@ const Feedback = ({
 
 const Statistics = ({
 	data: { good: dataGood, neutral: dataNeutral, bad: dataBad },
-}) => (
-	<div>
-		<h2>Statistics</h2>
-		<p>Good {dataGood}</p>
-		<p>Neutral {dataNeutral}</p>
-		<p>Bad {dataBad}</p>
-	</div>
-);
+}) => {
+	const sumData = () => {
+		return dataGood + dataNeutral + dataBad;
+	};
+
+	const average = () => {
+		const total = sumData();
+		const average = total ? ((dataGood - dataBad) / total).toFixed(2) : 0;
+		return average;
+	};
+
+	const positivePercentage = () => {
+		const total = sumData();
+		const positivePercentage = total
+			? `${((dataGood / total) * 100).toFixed(2)}%`
+			: 0;
+		return positivePercentage;
+	};
+
+	return (
+		<div>
+			<h2>Statistics</h2>
+			<p>Good {dataGood}</p>
+			<p>Neutral {dataNeutral}</p>
+			<p>Bad {dataBad}</p>
+			<p>
+				<b>All : {sumData()}</b>
+			</p>
+			<p>
+				<b>Average : {average()}</b>
+			</p>
+			<p>
+				<b>Positive : {positivePercentage()}</b>
+			</p>
+		</div>
+	);
+};
 const App = () => {
 	// State
 	const [good, setGood] = useState(0);
