@@ -1,17 +1,27 @@
 import { useState } from 'react';
 
+const Button = ({ clickHandler, text }) => (
+	<button onClick={clickHandler}>{text}</button>
+);
+
 // Destructuring parameters to improve legibility
 const Feedback = ({
 	handlers: { good: feedGood, neutral: feedNeutral, bad: feedBad },
 }) => (
 	<div>
 		<h1>Give feedback</h1>
-		<button onClick={feedGood}>Good</button>
-		<button onClick={feedNeutral}>Neutral</button>
-		<button onClick={feedBad}>Bad</button>
+		<Button clickHandler={feedGood} text='Good' />
+		<Button clickHandler={feedNeutral} text='Neutral' />
+		<Button clickHandler={feedBad} text='Bad' />
 	</div>
 );
 
+const StatisticLine = ({ value, text }) => (
+	<tr>
+		<td>{text}</td>
+		<td>{value}</td>
+	</tr>
+);
 const Statistics = ({
 	data: { good: dataGood, neutral: dataNeutral, bad: dataBad },
 }) => {
@@ -19,7 +29,7 @@ const Statistics = ({
 		return dataGood + dataNeutral + dataBad;
 	};
 
-	// No validation required for totals due to conditional rendering
+	// No validations required for total due to conditional rendering
 	const average = () => {
 		const total = addData();
 		return ((dataGood - dataBad) / total).toFixed(2);
@@ -34,20 +44,16 @@ const Statistics = ({
 		<div>
 			<h2>Statistics</h2>
 			{dataGood || dataNeutral || dataBad ? (
-				<>
-					<p>Good {dataGood}</p>
-					<p>Neutral {dataNeutral}</p>
-					<p>Bad {dataBad}</p>
-					<p>
-						<b>All : {addData()}</b>
-					</p>
-					<p>
-						<b>Average : {average()}</b>
-					</p>
-					<p>
-						<b>Positive : {positivePercentage()}</b>
-					</p>
-				</>
+				<table>
+					<tbody>
+						<StatisticLine value={dataGood} text='Good' />
+						<StatisticLine value={dataNeutral} text='Neutral' />
+						<StatisticLine value={dataBad} text='Bad' />
+						<StatisticLine value={addData()} text='All' />
+						<StatisticLine value={average()} text='Average' />
+						<StatisticLine value={positivePercentage()} text='Positive' />
+					</tbody>
+				</table>
 			) : (
 				<p>No feedback given</p>
 			)}
