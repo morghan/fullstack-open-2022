@@ -12,16 +12,19 @@ const Content = ({ parts }) => (
 		))}
 	</div>
 );
-// const Total = (props) => {
-// 	let total = 0;
-// 	props.parts.forEach((part) => (total += part.exercises));
-// 	return <p>Number of exercises {total}</p>;
-// };
+const Total = ({ parts }) => {
+	const total = parts.reduce(
+		(previous, current) => previous + current.exercises,
+		0
+	);
+	return <p>Number of exercises {total}</p>;
+};
 
 const Course = ({ course }) => (
 	<div>
 		<Header courseName={course.name} />
 		<Content parts={course.parts} />
+		<Total parts={course.parts} />
 	</div>
 );
 
