@@ -24,7 +24,12 @@ const App = () => {
 			<div>debug: {newName}</div>
 			<form onSubmit={addPerson}>
 				<div>
-					name: <input value={newName} onChange={handleNameChange} />
+					name:{' '}
+					<input
+						value={newName}
+						onChange={handleNameChange}
+						placeholder='add Person name'
+					/>
 				</div>
 				<div>
 					<button type='submit'>add</button>
