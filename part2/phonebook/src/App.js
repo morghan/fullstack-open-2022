@@ -1,6 +1,11 @@
 import { useState } from 'react'
 
-const Person = ({ person }) => <p>{person.name}</p>
+const Person = ({ person }) => (
+	<span>
+		{person.name}
+		<br />
+	</span>
+)
 const App = () => {
 	const [persons, setPersons] = useState([{ name: 'Arto Hellas' }])
 	const [newName, setNewName] = useState('')
@@ -10,7 +15,11 @@ const App = () => {
 	}
 	const addPerson = (event) => {
 		event.preventDefault()
-		if (newName) {
+		const personFound = persons.find(
+			(person) => person.name.toLowerCase() === newName.toLowerCase()
+		)
+		if (personFound) alert(`${newName} is already added to the phonebook`)
+		if (newName.trim() && !personFound) {
 			const newPerson = {
 				name: newName,
 			}
