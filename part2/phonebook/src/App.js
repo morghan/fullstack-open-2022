@@ -12,31 +12,25 @@ const App = () => {
 	])
 	const [newName, setNewName] = useState('')
 	const [newNumber, setNewNumber] = useState('')
-	const [filter, setFilter] = useState({ input: '', filteredPersons: persons })
+	const [filter, setFilter] = useState('')
 
 	const handleFilterChange = (event) => {
-		const filterInput = event.target.value.trim()
-		// If the filter input is empty, filteredPersons must have all persons
-		// since there is no filter
-		const filteredPersons = persons.filter((person) =>
-			person.name.toLowerCase().includes(filterInput)
-		)
-		setFilter({ input: filterInput, filteredPersons: filteredPersons })
+		setFilter(event.target.value)
 	}
 	const formProps = {
 		onSubmit: (event) => {
 			event.preventDefault()
 			const nameFound = persons.find(
-				(person) => person.name.toLowerCase() === newName.toLowerCase()
+				(person) => person.name.toLowerCase() === newName.toLowerCase().trim()
 			)
 			if (nameFound) {
 				alert(`${newName} is already added to the phonebook`)
 				return
 			}
-			if (newName.trim() && newNumber.trim()) {
+			if (newName && newNumber) {
 				const newPerson = {
-					name: newName,
-					number: newNumber,
+					name: newName.trim(),
+					number: newNumber.trim(),
 					id: persons.length + 1,
 				}
 				setPersons(persons.concat(newPerson))
@@ -57,14 +51,20 @@ const App = () => {
 			},
 		},
 	}
+
+	const filteredPersons = !filter
+		? persons
+		: persons.filter((person) =>
+				person.name.toLowerCase().includes(filter.toLowerCase().trim())
+		  )
 	return (
 		<div>
 			<h2>Phonebook</h2>
-			<Filter value={filter.input} onChange={handleFilterChange} />
+			<Filter value={filter} onChange={handleFilterChange} />
 			<h3>Add a new</h3>
 			<PersonForm formProps={formProps} />
 			<h3>Numbers</h3>
-			<People people={!filter.input ? persons : filter.filteredPersons} />
+			<People people={filteredPersons} />
 		</div>
 	)
 }
