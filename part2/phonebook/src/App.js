@@ -13,7 +13,7 @@ const App = () => {
 	useEffect(() => {
 		console.log('Fetching persons data..')
 		axios.get('http://localhost:3001/persons').then((response) => {
-			console.log('🚀 > axios.get > response', response.data)
+			console.log('Fetch success!')
 			setPersons(response.data)
 		})
 	}, [])
