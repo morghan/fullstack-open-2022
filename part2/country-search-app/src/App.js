@@ -5,7 +5,6 @@ import { CountryList } from './components/CountryList'
 const App = () => {
 	const [countries, setCountries] = useState([])
 	const [query, setQuery] = useState('')
-
 	useEffect(() => {
 		axios
 			.get('https://restcountries.com/v3.1/all')
