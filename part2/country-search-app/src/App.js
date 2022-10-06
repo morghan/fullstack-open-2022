@@ -5,6 +5,10 @@ import { CountryList } from './components/CountryList'
 const App = () => {
 	const [countries, setCountries] = useState([])
 	const [query, setQuery] = useState('')
+	const [visible, setVisible] = useState(
+		new Array(countries.length).fill(false)
+	)
+
 	useEffect(() => {
 		axios
 			.get('https://restcountries.com/v3.1/all')
@@ -13,6 +17,11 @@ const App = () => {
 
 	const handleQueryChange = (event) => {
 		setQuery(event.target.value)
+	}
+	const toggleVisible = (index) => {
+		const copy = { ...visible }
+		copy[index] = !copy[index]
+		setVisible(copy)
 	}
 
 	const searchedCountries = !query
