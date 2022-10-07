@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import Note from './components/Note'
+import noteService from './services/notes'
 
 const App = () => {
 	const [notes, setNotes] = useState([])
@@ -9,28 +9,36 @@ const App = () => {
 
 	useEffect(() => {
 		console.log('effect')
-		axios.get('http://localhost:3001/notes').then((response) => {
+		noteService.getAll().then((initialNotes) => {
 			console.log('Promise fulfilled')
-			setNotes(response.data)
+			setNotes(initialNotes)
 		})
 	}, [])
-	console.log('render', notes.length, 'notes')
+
 	const addNote = (event) => {
 		event.preventDefault()
 		const noteObject = {
 			content: newNote,
 			date: new Date().toISOString(),
 			important: Math.random() > 0.5,
-			id: notes.length + 1,
 		}
-
-		setNotes(notes.concat(noteObject))
-		setNewNote('')
+		noteService.create(noteObject).then((returnedNote) => {
+			setNotes(notes.concat(returnedNote))
+			setNewNote('')
+		})
 	}
-
 	const handleNoteChange = (event) => {
-		console.log(event.target.value)
 		setNewNote(event.target.value)
+	}
+	const toggleImportanceOf = (id) => {
+		const note = notes.find((note) => note.id === id)
+		const updatedNote = { ...note, important: !note.important }
+		noteService.update(id, updatedNote).then((returnedNote) => {
+			// map a new array in which only the note
+			// with id equal to the parameter is replaced with axios response
+			// that is the updated note
+			setNotes(notes.map((note) => (note.id !== id ? note : returnedNote)))
+		})
 	}
 
 	const notesToShow = showAll ? notes : notes.filter((note) => note.important)
@@ -45,7 +53,11 @@ const App = () => {
 			</div>
 			<ul>
 				{notesToShow.map((note) => (
-					<Note key={note.id} note={note} />
+					<Note
+						key={note.id}
+						note={note}
+						toggleImportance={() => toggleImportanceOf(note.id)}
+					/>
 				))}
 			</ul>
 			<form onSubmit={addNote}>
