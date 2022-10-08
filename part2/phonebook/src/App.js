@@ -56,6 +56,15 @@ const App = () => {
 			},
 		},
 	}
+	const deletePerson = (id) => {
+		const person = persons.find((person) => person.id === id)
+		const deleteConfirmed = window.confirm(`Delete ${person.name} ?`)
+		if (deleteConfirmed) {
+			personsService.erase(id).then(() => {
+				setPersons(persons.filter((person) => person.id !== id))
+			})
+		}
+	}
 
 	const filteredPersons = !filter
 		? persons
@@ -69,7 +78,7 @@ const App = () => {
 			<h3>Add a new</h3>
 			<PersonForm formProps={formProps} />
 			<h3>Numbers</h3>
-			<Persons persons={filteredPersons} />
+			<Persons persons={filteredPersons} handlePersonClick={deletePerson} />
 		</div>
 	)
 }
