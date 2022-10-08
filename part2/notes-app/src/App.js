@@ -33,12 +33,18 @@ const App = () => {
 	const toggleImportanceOf = (id) => {
 		const note = notes.find((note) => note.id === id)
 		const updatedNote = { ...note, important: !note.important }
-		noteService.update(id, updatedNote).then((returnedNote) => {
-			// map a new array in which only the note
-			// with id equal to the parameter is replaced with axios response
-			// that is the updated note
-			setNotes(notes.map((note) => (note.id !== id ? note : returnedNote)))
-		})
+		noteService
+			.update(id, updatedNote)
+			.then((returnedNote) => {
+				// map a new array in which only the note
+				// with id equal to the parameter is replaced with axios response
+				// that is the updated note
+				setNotes(notes.map((note) => (note.id !== id ? note : returnedNote)))
+			})
+			.catch((error) => {
+				alert(`the note '${note.content}' was already deleted from server`)
+				setNotes(notes.filter((note) => note.id !== id))
+			})
 	}
 
 	const notesToShow = showAll ? notes : notes.filter((note) => note.important)
