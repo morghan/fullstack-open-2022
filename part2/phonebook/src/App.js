@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Filter } from './components/Filter'
 import { PersonForm } from './components/PersonForm'
-import { People } from './components/People'
-import axios from 'axios'
+import { Persons } from './components/Persons'
+import personsService from './services/persons'
 
 const App = () => {
 	const [persons, setPersons] = useState([])
@@ -12,12 +12,11 @@ const App = () => {
 
 	useEffect(() => {
 		console.log('Fetching persons data..')
-		axios.get('http://localhost:3001/persons').then((response) => {
+		personsService.getAll().then((initialPersons) => {
 			console.log('Fetch success!')
-			setPersons(response.data)
+			setPersons(initialPersons)
 		})
 	}, [])
-	console.log({ persons })
 
 	const handleFilterChange = (event) => {
 		setFilter(event.target.value)
@@ -32,15 +31,16 @@ const App = () => {
 				alert(`${newName} is already added to the phonebook`)
 				return
 			}
-			if (newName && newNumber) {
+			if (newName.trim() && newNumber.trim()) {
 				const newPerson = {
 					name: newName.trim(),
 					number: newNumber.trim(),
-					id: persons.length + 1,
 				}
-				setPersons(persons.concat(newPerson))
-				setNewName('')
-				setNewNumber('')
+				personsService.create(newPerson).then((returnedPerson) => {
+					setPersons(persons.concat(returnedPerson))
+					setNewName('')
+					setNewNumber('')
+				})
 			} else alert('Name or number is empty')
 		},
 		nameInput: {
@@ -69,7 +69,7 @@ const App = () => {
 			<h3>Add a new</h3>
 			<PersonForm formProps={formProps} />
 			<h3>Numbers</h3>
-			<People people={filteredPersons} />
+			<Persons persons={filteredPersons} />
 		</div>
 	)
 }

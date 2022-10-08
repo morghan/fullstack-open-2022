@@ -4,9 +4,9 @@ const Person = ({ person }) => (
 	</div>
 )
 
-export const People = ({ people }) => (
+export const Persons = ({ persons }) => (
 	<div>
-		{people.map((person) => (
+		{persons.map((person) => (
 			<Person key={person.id} person={person} />
 		))}
 	</div>
