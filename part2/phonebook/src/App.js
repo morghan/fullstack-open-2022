@@ -24,24 +24,40 @@ const App = () => {
 	const formProps = {
 		onSubmit: (event) => {
 			event.preventDefault()
-			const nameFound = persons.find(
-				(person) => person.name.toLowerCase() === newName.toLowerCase().trim()
-			)
-			if (nameFound) {
-				alert(`${newName} is already added to the phonebook`)
-				return
-			}
 			if (newName.trim() && newNumber.trim()) {
-				const newPerson = {
-					name: newName.trim(),
-					number: newNumber.trim(),
+				const personFound = persons.find(
+					(person) => person.name.toLowerCase() === newName.toLowerCase().trim()
+				)
+				if (personFound) {
+					const updateConfirm = window.confirm(
+						`${newName} is already added to the phonebook, replace old number with a new one?`
+					)
+					if (updateConfirm) {
+						const modifiedPerson = { ...personFound, number: newNumber.trim() }
+						personsService
+							.update(personFound.id, modifiedPerson)
+							.then((returnedPerson) => {
+								setPersons(
+									persons.map((person) =>
+										person.id !== personFound.id ? person : returnedPerson
+									)
+								)
+							})
+					}
+				} else {
+					const newPerson = {
+						name: newName.trim(),
+						number: newNumber.trim(),
+					}
+					personsService.create(newPerson).then((returnedPerson) => {
+						setPersons(persons.concat(returnedPerson))
+						setNewName('')
+						setNewNumber('')
+					})
 				}
-				personsService.create(newPerson).then((returnedPerson) => {
-					setPersons(persons.concat(returnedPerson))
-					setNewName('')
-					setNewNumber('')
-				})
-			} else alert('Name or number is empty')
+			} else {
+				alert('Name or number is empty')
+			}
 		},
 		nameInput: {
 			value: newName,
