@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Filter } from './components/Filter'
 import { PersonForm } from './components/PersonForm'
 import { Persons } from './components/Persons'
+import { Notification } from './components/Notification'
 import personsService from './services/persons'
 
 const App = () => {
@@ -9,6 +10,7 @@ const App = () => {
 	const [newName, setNewName] = useState('')
 	const [newNumber, setNewNumber] = useState('')
 	const [filter, setFilter] = useState('')
+	const [notificationMessage, setNotificationMessage] = useState(null)
 
 	useEffect(() => {
 		console.log('Fetching persons data..')
@@ -42,6 +44,10 @@ const App = () => {
 										person.id !== personFound.id ? person : returnedPerson
 									)
 								)
+								setNotificationMessage(`Updated ${returnedPerson.name}`)
+								setTimeout(() => {
+									setNotificationMessage(null)
+								}, 3000)
 							})
 					}
 				} else {
@@ -53,6 +59,10 @@ const App = () => {
 						setPersons(persons.concat(returnedPerson))
 						setNewName('')
 						setNewNumber('')
+						setNotificationMessage(`Added ${returnedPerson.name}`)
+						setTimeout(() => {
+							setNotificationMessage(null)
+						}, 3000)
 					})
 				}
 			} else {
@@ -90,6 +100,7 @@ const App = () => {
 	return (
 		<div>
 			<h2>Phonebook</h2>
+			<Notification message={notificationMessage} />
 			<Filter value={filter} onChange={handleFilterChange} />
 			<h3>Add a new</h3>
 			<PersonForm formProps={formProps} />
