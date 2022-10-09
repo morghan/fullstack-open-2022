@@ -26,6 +26,7 @@ const App = () => {
 	const formProps = {
 		onSubmit: (event) => {
 			event.preventDefault()
+			let message = {}
 			if (newName.trim() && newNumber.trim()) {
 				const personFound = persons.find(
 					(person) => person.name.toLowerCase() === newName.toLowerCase().trim()
@@ -39,15 +40,32 @@ const App = () => {
 						personsService
 							.update(personFound.id, modifiedPerson)
 							.then((returnedPerson) => {
+								message = {
+									content: `Updated ${returnedPerson.name}`,
+									type: 'success',
+								}
 								setPersons(
 									persons.map((person) =>
 										person.id !== personFound.id ? person : returnedPerson
 									)
 								)
-								setNotificationMessage(`Updated ${returnedPerson.name}`)
+								setNotificationMessage(message)
 								setTimeout(() => {
 									setNotificationMessage(null)
-								}, 3000)
+								}, 5000)
+							})
+							.catch((error) => {
+								message = {
+									content: `${personFound.name}'s information has already been removed from server`,
+									type: 'error',
+								}
+								setNotificationMessage(message)
+								setTimeout(() => {
+									setNotificationMessage(null)
+								}, 5000)
+								setPersons(
+									persons.filter((person) => person.id !== personFound.id)
+								)
 							})
 					}
 				} else {
@@ -59,10 +77,14 @@ const App = () => {
 						setPersons(persons.concat(returnedPerson))
 						setNewName('')
 						setNewNumber('')
-						setNotificationMessage(`Added ${returnedPerson.name}`)
+						message = {
+							content: `Added ${returnedPerson.name}`,
+							type: 'success',
+						}
+						setNotificationMessage(message)
 						setTimeout(() => {
 							setNotificationMessage(null)
-						}, 3000)
+						}, 5000)
 					})
 				}
 			} else {
@@ -83,12 +105,34 @@ const App = () => {
 		},
 	}
 	const deletePerson = (id) => {
-		const person = persons.find((person) => person.id === id)
-		const deleteConfirmed = window.confirm(`Delete ${person.name} ?`)
+		let message = {}
+		const personFound = persons.find((person) => person.id === id)
+		const deleteConfirmed = window.confirm(`Delete ${personFound.name} ?`)
 		if (deleteConfirmed) {
-			personsService.erase(id).then(() => {
-				setPersons(persons.filter((person) => person.id !== id))
-			})
+			personsService
+				.erase(id)
+				.then(() => {
+					setPersons(persons.filter((person) => person.id !== id))
+					message = {
+						content: `${personFound.name}'s information was deleted`,
+						type: 'success',
+					}
+					setNotificationMessage(message)
+					setTimeout(() => {
+						setNotificationMessage(null)
+					}, 5000)
+				})
+				.catch((error) => {
+					message = {
+						content: `${personFound.name}'s information has already been removed from server`,
+						type: 'error',
+					}
+					setNotificationMessage(message)
+					setTimeout(() => {
+						setNotificationMessage(null)
+					}, 5000)
+					setPersons(persons.filter((person) => person.id !== personFound.id))
+				})
 		}
 	}
 
