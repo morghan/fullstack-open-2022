@@ -1,6 +1,9 @@
 import axios from 'axios'
 
-const baseUrl = 'http://localhost:3001/notes'
+// baseUrl can be relative since we are deploying the frontend and backend
+// into the same server i.e. same address
+// However, a proxy for dev backend address must be added to package.json
+const baseUrl = '/api/notes'
 // then() method returns a Promise
 // In our service the fulfilled Promise returns the response.data
 const getAll = () => {
