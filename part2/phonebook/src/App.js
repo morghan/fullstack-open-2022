@@ -23,10 +23,16 @@ const App = () => {
 	const handleFilterChange = (event) => {
 		setFilter(event.target.value)
 	}
+	const createNotification = (content, type) => {
+		let message = { content, type }
+		setNotificationMessage(message)
+		setTimeout(() => {
+			setNotificationMessage(null)
+		}, 5000)
+	}
 	const formProps = {
 		onSubmit: (event) => {
 			event.preventDefault()
-			let message = {}
 			if (newName.trim() && newNumber.trim()) {
 				const personFound = persons.find(
 					(person) => person.name.toLowerCase() === newName.toLowerCase().trim()
@@ -36,36 +42,23 @@ const App = () => {
 						`${newName} is already added to the phonebook, replace old number with a new one?`
 					)
 					if (updateConfirm) {
-						const modifiedPerson = { ...personFound, number: newNumber.trim() }
+						const modifiedPerson = {
+							...personFound,
+							name: newName.trim(),
+							number: newNumber.trim(),
+						}
 						personsService
 							.update(personFound.id, modifiedPerson)
 							.then((returnedPerson) => {
-								message = {
-									content: `Updated ${returnedPerson.name}`,
-									type: 'success',
-								}
 								setPersons(
 									persons.map((person) =>
 										person.id !== personFound.id ? person : returnedPerson
 									)
 								)
-								setNotificationMessage(message)
-								setTimeout(() => {
-									setNotificationMessage(null)
-								}, 5000)
+								createNotification(`Updated ${returnedPerson.name}`, 'success')
 							})
 							.catch((error) => {
-								message = {
-									content: `${personFound.name}'s information has already been removed from server`,
-									type: 'error',
-								}
-								setNotificationMessage(message)
-								setTimeout(() => {
-									setNotificationMessage(null)
-								}, 5000)
-								setPersons(
-									persons.filter((person) => person.id !== personFound.id)
-								)
+								createNotification(error.response.data.error, 'error')
 							})
 					}
 				} else {
@@ -73,19 +66,17 @@ const App = () => {
 						name: newName.trim(),
 						number: newNumber.trim(),
 					}
-					personsService.create(newPerson).then((returnedPerson) => {
-						setPersons(persons.concat(returnedPerson))
-						setNewName('')
-						setNewNumber('')
-						message = {
-							content: `Added ${returnedPerson.name}`,
-							type: 'success',
-						}
-						setNotificationMessage(message)
-						setTimeout(() => {
-							setNotificationMessage(null)
-						}, 5000)
-					})
+					personsService
+						.create(newPerson)
+						.then((returnedPerson) => {
+							setPersons(persons.concat(returnedPerson))
+							setNewName('')
+							setNewNumber('')
+							createNotification(`Added ${returnedPerson.name}`, 'success')
+						})
+						.catch((error) => {
+							createNotification(error.response.data.error, 'error')
+						})
 				}
 			} else {
 				alert('Name or number is empty')
@@ -105,7 +96,6 @@ const App = () => {
 		},
 	}
 	const deletePerson = (id) => {
-		let message = {}
 		const personFound = persons.find((person) => person.id === id)
 		const deleteConfirmed = window.confirm(`Delete ${personFound.name} ?`)
 		if (deleteConfirmed) {
@@ -113,24 +103,16 @@ const App = () => {
 				.erase(id)
 				.then(() => {
 					setPersons(persons.filter((person) => person.id !== id))
-					message = {
-						content: `${personFound.name}'s information was deleted`,
-						type: 'success',
-					}
-					setNotificationMessage(message)
-					setTimeout(() => {
-						setNotificationMessage(null)
-					}, 5000)
+					createNotification(
+						`${personFound.name}'s information was deleted`,
+						'success'
+					)
 				})
 				.catch((error) => {
-					message = {
-						content: `${personFound.name}'s information has already been removed from server`,
-						type: 'error',
-					}
-					setNotificationMessage(message)
-					setTimeout(() => {
-						setNotificationMessage(null)
-					}, 5000)
+					createNotification(
+						`${personFound.name}'s information has already been removed from server`,
+						'error'
+					)
 					setPersons(persons.filter((person) => person.id !== personFound.id))
 				})
 		}
