@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const mongoose = require('mongoose')
 
 if (process.argv.length < 3) {
@@ -39,7 +40,7 @@ const Note = mongoose.model('Note', noteSchema)
 // 	.catch((err) => console.log(err))
 mongoose
   .connect(url)
-  .then((result) => {
+  .then(() => {
     console.log('connected')
     Note.find({ important: false }).then((result) => {
       result.forEach((note) => {
