@@ -11,7 +11,7 @@
     "deploy:full": "npm run build:ui && npm run deploy",
     "logs:prod": "fly logs",
     "lint": "eslint .",
-    "test": "jest --verbose"
+    "test": "node --test"
   },
   "author": "Jerzon Hernandez",
   "license": "MIT",
@@ -23,8 +23,7 @@
   },
   "devDependencies": {
     "eslint": "^8.26.0",
-    "jest": "^29.2.2",
-    "nodemon": "^2.0.20"
+    "nodemon": "^3.1.7"
   },
   "jest": {
     "testEnvironment": "node"
