@@ -2,13 +2,15 @@ const { test, after, describe, beforeEach } = require('node:test')
 const assert = require('node:assert')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
+const bcrypt = require('bcrypt')
 const app = require('../app')
 const helper = require('./test_helper')
 const Note = require('../models/note')
+const User = require('../models/user')
 
 const api = supertest(app)
 
-describe('when there is initially some notes saved', () => {
+describe('When there is initially some notes saved', () => {
   beforeEach(async () => {
     await Note.deleteMany({})
 
@@ -122,6 +124,64 @@ describe('when there is initially some notes saved', () => {
       assert(!contents.includes(noteToDelete.content))
     })
   })
+
+  describe('When there is initially 1 user in db', () => {
+    beforeEach(async () => {
+      await User.deleteMany({})
+
+      const passwordHash = await bcrypt.hash('secret', 10)
+      const user = new User({ username: 'root', passwordHash: passwordHash })
+
+      await user.save()
+    })
+
+    test('creation of new user succeeds with 201 and fresh username', async () => {
+      const usersAtStart = await helper.usersInDb()
+
+      const newUser = {
+        username: 'morghan831',
+        name: 'Jerzon',
+        password: 'pass123'
+      }
+
+      await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+      const usersAtEnd = await helper.usersInDb()
+
+      assert.strictEqual(usersAtEnd.length, usersAtStart.length + 1)
+
+      const usernames = usersAtEnd.map((user) => user.username)
+
+      assert(usernames.includes(newUser.username))
+    })
+
+    test('creation fails with status 400 and message if username is already taken', async () => {
+      const usersAtStart = await helper.usersInDb()
+
+      const newUser = {
+        username: 'root',
+        name: 'Superuser',
+        password: 'pass10'
+      }
+
+      const response = await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+
+      assert(response.body.error.includes('expected `username` to be unique'))
+
+      const usersAtEnd = await helper.usersInDb()
+
+      assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+    })
+  })
+
   after(async () => {
     await mongoose.connection.close()
     console.log('🚀 ~ Database connection closed')
