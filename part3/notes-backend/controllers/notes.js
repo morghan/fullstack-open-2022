@@ -1,11 +1,20 @@
 const notesRouter = require('express').Router()
 const Note = require('../models/note')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
+
+const getTokenFrom = (request) => {
+  const auth = request.get('Authorization')
+  if (auth && auth.startsWith('Bearer ')) {
+    return auth.replace('Bearer ', '')
+  }
+  return null
+}
 
 notesRouter.get('/', async (request, response) => {
   const notes = await Note.find({}).populate('user', {
     username: 1,
-    name: 1
+    name: 1,
   })
   response.json(notes)
 })
@@ -29,13 +38,18 @@ notesRouter.post('/', async (request, response, next) => {
     return response.status(400).json({ error: 'content missing' })
   }
 
-  const user = await User.findById(body.userId)
+  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'Invalid token' })
+  }
+
+  const user = await User.findById(decodedToken.id)
 
   const note = new Note({
     content: body.content,
     important: body.important || false,
     date: new Date(),
-    user: user._id
+    user: user._id,
   })
 
   try {
@@ -66,7 +80,7 @@ notesRouter.put('/:id', (request, response, next) => {
   Note.findByIdAndUpdate(request.params.id, note, {
     new: true,
     runValidators: true,
-    context: 'query'
+    context: 'query',
   })
     .then((updatedNote) => {
       response.json(updatedNote)
