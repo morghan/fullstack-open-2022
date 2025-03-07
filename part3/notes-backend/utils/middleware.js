@@ -26,6 +26,8 @@ const errorHandler = (error, req, res, next) => {
     return res.status(400).json({ error: 'expected `username` to be unique' })
   } else if (error.name === 'JsonWebTokenError') {
     return res.status(401).json({ error: 'invalid token' })
+  } else if (error.name === 'TokenExpiredError') {
+    return res.status(401).json({ error: 'token expired' })
   }
   // In case other type of error occurs, send it to
   // express' default error handler
